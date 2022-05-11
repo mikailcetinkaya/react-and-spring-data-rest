@@ -15,8 +15,12 @@
  */
 package com.kuehne.payroll;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpringDataJpaUserDetailsService implements UserDetailsService {
+	Logger logger = LoggerFactory.getLogger(SpringDataJpaUserDetailsService.class);
 
 	private final ManagerRepository repository;
 	private final EmployeeRepository employeeRepository;
@@ -38,11 +43,32 @@ public class SpringDataJpaUserDetailsService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-		Manager manager = this.repository.findByName(name);
+	public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException  {
+		try {
+			Manager manager = this.repository.findByName(name);
+			return new User(manager.getName(), manager.getPassword(),
+					AuthorityUtils.createAuthorityList(manager.getRoles()));
+		}catch (Exception e){
+
+		}
+
+		logger.debug(name);
+		SecurityContextHolder.getContext().setAuthentication(
+				new UsernamePasswordAuthenticationToken("SYSTEM", "doesn't matter",
+						AuthorityUtils.createAuthorityList(Roles.MANAGER)));
 		Employee emp=this.employeeRepository.findByUserName(name);
-		return new User(manager.getName(), manager.getPassword(),
-				AuthorityUtils.createAuthorityList(manager.getRoles()));
+		SecurityContextHolder.clearContext();
+		if(emp==null) throw new IllegalArgumentException("Bad credentials");
+		try {
+			return new User(emp.getUserName(), emp.getPassword(),
+					AuthorityUtils.createAuthorityList(Roles.EMPLOYEE));
+		}catch (IllegalArgumentException e){
+			throw new IllegalArgumentException("Get password from manager"
+					+ (emp.getManager()==null?"":":"+emp.getManager().getName()), e);
+		}
+
+
+
 	}
 
 }

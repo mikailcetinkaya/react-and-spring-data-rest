@@ -15,6 +15,7 @@
  */
 package com.kuehne.payroll;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -24,7 +25,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jdk.internal.dynalink.support.NameCodec;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Entity
@@ -35,6 +38,8 @@ public class Employee {
 	private String lastName;
 	private String userName;
 	private String description;
+	private BigDecimal balance=BigDecimal.ZERO;
+	private String password;
 
 	private @Version @JsonIgnore Long version;
 
@@ -48,6 +53,7 @@ public class Employee {
 		this.description = description;
 		this.manager = manager;
 		this.userName=userName;
+
 	}
 
 	@Override
@@ -135,6 +141,24 @@ public class Employee {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public BigDecimal getBalance() {
+		return balance;
+	}
+
+	public void setBalance(BigDecimal balance) throws Exception {
+		if(balance.compareTo(BigDecimal.ZERO)<0)
+			throw new Exception("Balance must be non negative");
+		this.balance = balance;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = Manager.PASSWORD_ENCODER.encode(password);
 	}
 }
 

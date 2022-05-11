@@ -16,7 +16,7 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {employees: [], attributes: [], page: 1, pageSize: 2, links: {}
-		   , loggedInManager: this.props.loggedInManager};
+		   , loggedInManager: this.props.loggedInManager,role: this.props.role};
 		this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
 		this.onUpdate = this.onUpdate.bind(this);
@@ -234,7 +234,8 @@ class App extends React.Component {
 							  onUpdate={this.onUpdate}
 							  onDelete={this.onDelete}
 							  updatePageSize={this.updatePageSize}
-							  loggedInManager={this.state.loggedInManager}/>
+							  loggedInManager={this.state.loggedInManager}
+							  role={this.state.role}/>
 			</div>
 		)
 	}
@@ -315,8 +316,9 @@ class UpdateDialog extends React.Component {
 
 		const dialogId = "updateEmployee-" + this.props.employee.entity._links.self.href;
 
-		const isManagerCorrect = this.props.employee.entity.manager.name == this.props.loggedInManager;
-
+		const isManagerCorrect = this.props.role == 'ROLE_MANAGER'  || this.props.employee.entity.manager.name == this.props.loggedInManager;
+		console.log(this.props.role);
+		const d=0;
 		if (isManagerCorrect === false) {
 			return (
 					<div>
@@ -398,7 +400,8 @@ class EmployeeList extends React.Component {
 					  attributes={this.props.attributes}
 					  onUpdate={this.props.onUpdate}
 					  onDelete={this.props.onDelete}
-					  loggedInManager={this.props.loggedInManager}/>
+					  loggedInManager={this.props.loggedInManager}
+					  role={this.props.role}/>
 		);
 
 		const navLinks = [];
@@ -426,6 +429,8 @@ class EmployeeList extends React.Component {
 							<th>Last Name</th>
 							<th>Description</th>
 							<th>Manager</th>
+							<th>Balance</th>
+							<th></th>
 							<th></th>
 							<th></th>
 						</tr>
@@ -459,15 +464,20 @@ class Employee extends React.Component {
 				<td>{this.props.employee.entity.lastName}</td>
 				<td>{this.props.employee.entity.description}</td>
 				<td>{this.props.employee.entity.manager.name}</td>
+				<td>{this.props.employee.entity.balance}</td>
 				<td>
 					<UpdateDialog employee={this.props.employee}
 								  attributes={this.props.attributes}
 								  onUpdate={this.props.onUpdate}
-								  loggedInManager={this.props.loggedInManager}/>
+								  loggedInManager={this.props.loggedInManager}
+								  role={this.props.role}/>
 				</td>
 				<td>
 					<button onClick={this.handleDelete}>Delete</button>
 				</td>
+				<td>
+                	<button onClick={this.handleSend}>Send</button>
+                </td>
 			</tr>
 		)
 	}
@@ -475,7 +485,7 @@ class Employee extends React.Component {
 // end::employee[]
 
 ReactDOM.render(
-	<App loggedInManager={document.getElementById('managername').innerHTML } />,
+	<App loggedInManager={document.getElementById('managername').innerHTML } role={document.getElementById('Roles').innerHTML } />,
 	document.getElementById('react')
 )
 

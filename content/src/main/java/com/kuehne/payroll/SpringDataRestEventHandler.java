@@ -44,7 +44,7 @@ public class SpringDataRestEventHandler {
 		if (manager == null) {
 			Manager newManager = new Manager();
 			newManager.setName(name);
-			newManager.setRoles(new String[]{"ROLE_MANAGER"});
+			newManager.setRoles(new String[]{Roles.MANAGER});
 			manager = this.managerRepository.save(newManager);
 		}
 		employee.setManager(manager);

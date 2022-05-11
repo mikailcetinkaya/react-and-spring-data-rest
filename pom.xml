@@ -61,7 +61,7 @@
 		</pluginManagement>
 	</build>
 	<modules>
-		<module>security</module>
+		<module>content</module>
 	</modules>
 
 </project>

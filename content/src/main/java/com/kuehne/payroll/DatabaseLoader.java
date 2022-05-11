@@ -41,26 +41,26 @@ public class DatabaseLoader implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 
-		Manager greg = this.managers.save(new Manager("greg", "turnquist",
+		Manager miko = this.managers.save(new Manager("miko", "yuji",
 							"ROLE_MANAGER"));
-		Manager oliver = this.managers.save(new Manager("oliver", "gierke",
+		Manager yuji = this.managers.save(new Manager("yuji", "miko",
 							"ROLE_MANAGER"));
 
 		SecurityContextHolder.getContext().setAuthentication(
-			new UsernamePasswordAuthenticationToken("greg", "doesn't matter",
+			new UsernamePasswordAuthenticationToken("miko", "doesn't matter",
 				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
 
-		this.employees.save(new Employee("Frodo", "Baggins","frodo", "ring bearer", greg));
-		this.employees.save(new Employee("Bilbo", "Baggins", "bilbo","burglar", greg));
-		this.employees.save(new Employee("Gandalf", "the Grey", "gangan","wizard", greg));
+		this.employees.save(new Employee("Frodo", "Baggins","frodo", "ring bearer", miko));
+		this.employees.save(new Employee("Bilbo", "Baggins", "bilbo","burglar", miko));
+		this.employees.save(new Employee("Gandalf", "the Grey", "gangan","wizard", miko));
 
 		SecurityContextHolder.getContext().setAuthentication(
-			new UsernamePasswordAuthenticationToken("oliver", "doesn't matter",
+			new UsernamePasswordAuthenticationToken("yuji", "doesn't matter",
 				AuthorityUtils.createAuthorityList("ROLE_MANAGER")));
 
-		this.employees.save(new Employee("Samwise", "Gamgee", "sammy","gardener", oliver));
-		this.employees.save(new Employee("Merry", "Brandybuck", "merry","pony rider", oliver));
-		this.employees.save(new Employee("Peregrin", "Took", "pere","pipe smoker", oliver));
+		this.employees.save(new Employee("Samwise", "Gamgee", "sammy","gardener", yuji));
+		this.employees.save(new Employee("Merry", "Brandybuck", "merry","pony rider", yuji));
+		this.employees.save(new Employee("Peregrin", "Took", "pere","pipe smoker", yuji));
 
 		SecurityContextHolder.clearContext();
 	}
