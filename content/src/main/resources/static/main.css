@@ -5,6 +5,18 @@ input.field {
 table {
     border-collapse: collapse;
 }
+.accountBar{
+   margin: auto;
+  width: 60%;
+  border: 3px solid #73AD21;
+  padding: 10px;
+  display: flex;
+  align-items:center;}
+
+#react {border:5px solid;
+border-color:blue;
+          border-width: thick;}
+
 
 td, th {
     border: 1px solid #999;

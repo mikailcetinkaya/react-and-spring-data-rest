@@ -15,7 +15,7 @@ class App extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {employees: [], attributes: [], page: 1, pageSize: 2, links: {}
+		this.state = {employees: [], attributes: [], page: 1, pageSize: 5, links: {}
 		   , loggedInManager: this.props.loggedInManager,role: this.props.role};
 		this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
@@ -34,7 +34,7 @@ class App extends React.Component {
 			return client({
 				method: 'GET',
 				path: employeeCollection.entity._links.profile.href,
-				headers: {'Accept': 'application/schema+json'}
+				headers: {'Accept' : 'application/schema+json'}
 			}).then(schema => {
 				// tag::json-schema-filter[]
 				/**
@@ -248,7 +248,9 @@ class App extends React.Component {
 		stompClient.register([
 			{route: '/topic/newEmployee', callback: this.refreshAndGoToLastPage},
 			{route: '/topic/updateEmployee', callback: this.refreshCurrentPage},
-			{route: '/topic/deleteEmployee', callback: this.refreshCurrentPage}
+			{route: '/topic/deleteEmployee', callback: this.refreshCurrentPage},
+			{route: '/topic/newTrx', callback: this.refreshCurrentPage},
+			{route: '/topic/updateTrx', callback: this.refreshCurrentPage}
 		]);
 	}
 	// end::register-handlers[]
@@ -455,10 +457,11 @@ class EmployeeList extends React.Component {
 		return (
 			<div>
 				{pageInfo}
-				<input ref="pageSize" defaultValue={this.props.pageSize} onInput={this.handleInput}/>
+				PageSize:<input ref="pageSize" defaultValue={this.props.pageSize} onInput={this.handleInput}/>
 				<table>
 					<tbody>
 						<tr>
+						    <th>User Name</th>
 							<th>First Name</th>
 							<th>Last Name</th>
 							<th>Description</th>
@@ -498,11 +501,13 @@ class Employee extends React.Component {
 	render() {
 		return (
 			<tr>
+			    <td>{this.props.employee.entity.userName}</td>
 				<td>{this.props.employee.entity.firstName  }</td>
 				<td>{this.props.employee.entity.lastName}</td>
 				<td>{this.props.employee.entity.description}</td>
 				<td>{this.props.employee.entity.manager.name}</td>
 				<td>{this.props.employee.entity.balance}</td>
+
 				<td>
 					<UpdateDialog employee={this.props.employee}
 								  attributes={this.props.attributes}

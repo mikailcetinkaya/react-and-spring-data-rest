@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@RepositoryEventHandler(Employee.class)
+@RepositoryEventHandler
 public class EventHandler {
 
 	private final SimpMessagingTemplate websocket;
@@ -45,7 +45,7 @@ public class EventHandler {
 	@HandleAfterCreate
 	public void newEmployee(Employee employee) {
 		this.websocket.convertAndSend(
-				MESSAGE_PREFIX + "/newEmployee", getPath(employee));
+				MESSAGE_PREFIX + "/ ", getPath(employee));
 	}
 
 	@HandleAfterDelete
@@ -53,6 +53,25 @@ public class EventHandler {
 		this.websocket.convertAndSend(
 				MESSAGE_PREFIX + "/deleteEmployee", getPath(employee));
 	}
+
+	@HandleAfterSave
+	public void updateTrx(Trx trx) {
+		this.websocket.convertAndSend(
+				MESSAGE_PREFIX + "/updateTrx", getPath(trx));
+	}
+
+	private Object getPath(Trx trx) {
+		return this.entityLinks.linkForItemResource(trx.getClass(),
+				trx.getId()).toUri().getPath();
+
+	}
+
+	@HandleAfterCreate
+	public void newTrx(Trx trx) {
+		this.websocket.convertAndSend(
+				MESSAGE_PREFIX + "/newTrx", getPath(trx));
+	}
+
 
 	@HandleAfterSave
 	public void updateEmployee(Employee employee) {
@@ -63,7 +82,6 @@ public class EventHandler {
 	/**
 	 * Take an {@link Employee} and get the URI using Spring Data REST's {@link EntityLinks}.
 	 *
-	 * @param employee
 	 */
 	private String getPath(Employee employee) {
 		return this.entityLinks.linkForItemResource(employee.getClass(),

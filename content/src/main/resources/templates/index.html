@@ -5,11 +5,12 @@
     <title>ReactJS + Spring Data REST</title>
     <link rel="stylesheet" href="/main.css" />
 </head>
-<body>
+<body style="font-family: monospace;">
     <!-- tag::logout[] -->
-    <div>
+    <div class="accountBar">
+        <img src="/indir.jfif">
         Hello, <span id="managername" th:text="${#authentication.name}">user</span> (<span id="Roles" th:text="${#authentication.authorities[0]}">roles</span>).
-        <form th:action="@{/logout}" method="post">
+        <form th:action="@{/logout}" method="post" style="display: contents;">
             <input type="submit" value="Log Out"/>
         </form>
     </div>
