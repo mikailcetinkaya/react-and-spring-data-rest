@@ -134,13 +134,33 @@ class App extends React.Component {
 	// end::on-delete[]
 	onSend(trx) {
 	console.log(trx.entity.firstName);
-    		follow(client, root, ['trxs']).done(response => {
+	var balanceD = prompt('How much to send ? ');
+    		follow(client, root, ['trxes']).done(response => {
             			client({
             				method: 'POST',
             				path: response.entity._links.self.href,
-            				entity: newTrxs,
+            				entity:
+            				    {
+            				        senderUserName:this.state.loggedInManager,
+            				        receiverUserName:trx.entity.userName,
+            				        balance:balanceD
+            				    },
             				headers: {'Content-Type': 'application/json'}
-            			})
+            			}).done(response => {
+                          				/* Let the websocket handler update the state */
+                          			}, response => {
+                          				if (response.status.code === 403) {
+                          					alert('ACCESS DENIED: You are not authorized to update ' );
+                          				}
+                          				if (response.status.code === 412) {
+                          					alert('DENIED: Unable to update ');
+                          				}
+                          				if (response.status.code === 500) {
+                                            alert(response.entity);
+                                        }
+
+                          			}
+                          		)
             		})
     	}
 
@@ -282,13 +302,13 @@ class CreateDialog extends React.Component {
 		);
 		return (
 			<div>
-				<a href="#createEmployee">Create</a>
+				<a href="#createEmployee">Create Employee Account</a>
 
 				<div id="createEmployee" className="modalDialog">
 					<div>
 						<a href="#" title="Close" className="close">X</a>
 
-						<h2>Create new employee</h2>
+						<h2>Create new employee account</h2>
 
 						<form>
 							{inputs}
@@ -405,7 +425,7 @@ class EmployeeList extends React.Component {
 
 	render() {
 		const pageInfo = this.props.page.hasOwnProperty("number") ?
-			<h3>Employees - Page {this.props.page.number + 1} of {this.props.page.totalPages}</h3> : null;
+			<h3>Employee Accounts - Page {this.props.page.number + 1} of {this.props.page.totalPages}</h3> : null;
 
 		const employees = this.props.employees.map(employee =>
 			<Employee key={employee.entity._links.self.href}

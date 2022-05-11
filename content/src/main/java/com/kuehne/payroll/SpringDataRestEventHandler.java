@@ -15,24 +15,33 @@
  */
 package com.kuehne.payroll;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
 
 
 @Component
 @RepositoryEventHandler(Employee.class)
 public class SpringDataRestEventHandler {
 
+	Logger logger = LoggerFactory.getLogger(SpringDataRestEventHandler.class);
 	private final ManagerRepository managerRepository;
-
+	private final EmployeeRepository employeeRepository;
 	@Autowired
-	public SpringDataRestEventHandler(ManagerRepository managerRepository) {
-		this.managerRepository = managerRepository;
+	public SpringDataRestEventHandler(ManagerRepository managerRepository,EmployeeRepository employeeRepository) {
+		this.managerRepository  = managerRepository;
+		this.employeeRepository = employeeRepository;
+
 	}
 
 	@HandleBeforeCreate
@@ -48,6 +57,35 @@ public class SpringDataRestEventHandler {
 			manager = this.managerRepository.save(newManager);
 		}
 		employee.setManager(manager);
+	}
+
+	@Transactional
+	@HandleBeforeCreate
+	@HandleBeforeSave
+	public void applyUserInformationUsingSecurityContext(Trx trx) throws Exception {
+		logger.info(trx.getSenderUserName());
+		logger.info(trx.getReceiverUserName());
+
+		if(trx.getReceiverUserName()==null) throw new Exception("Bad Receiver");
+		if(trx.getSenderUserName()==null) throw new Exception("Bad Sender");
+		if(trx.getSenderUserName().equals(trx.getReceiverUserName())) throw new Exception("Sender Receiver is SAME");
+		if(trx.getBalance()==null || trx.getBalance().compareTo(BigDecimal.ZERO)<0) throw new Exception("Bad Amount");
+
+		Employee receiver = this.employeeRepository.findByUserName(trx.getReceiverUserName());
+		Employee sender = this.employeeRepository.findByUserName(trx.getSenderUserName());
+
+		Manager manager = this.managerRepository.findByName(trx.getSenderUserName());
+		if(manager==null)
+		{
+			if(sender.getBalance().compareTo(trx.getBalance())<0)
+				throw new Exception("Insufficient Funds");
+			sender.setBalance(sender.getBalance().subtract(trx.getBalance()));
+			this.employeeRepository.save(sender);
+		}
+
+		receiver.setBalance(receiver.getBalance().add(trx.getBalance()));
+		this.employeeRepository.save(receiver);
+
 	}
 }
 

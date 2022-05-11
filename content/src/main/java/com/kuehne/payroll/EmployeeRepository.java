@@ -29,7 +29,7 @@ public interface EmployeeRepository extends PagingAndSortingRepository<Employee,
 
 
 	@Override
-	@PreAuthorize("#employee?.manager == null or #employee?.manager?.name == authentication?.name or #employee?.userName==authentication?.name")
+	@PreAuthorize("#employee?.manager == null or authentication?.name =='SYSTEM' or #employee?.manager?.name == authentication?.name or #employee?.userName==authentication?.name")
 	Employee save(@Param("employee") Employee employee);
 
 	@Override

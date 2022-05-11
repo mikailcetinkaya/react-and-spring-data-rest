@@ -18,11 +18,7 @@ package com.kuehne.payroll;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.internal.dynalink.support.NameCodec;
@@ -36,9 +32,10 @@ public class Employee {
 	private @Id @GeneratedValue Long id;
 	private String firstName;
 	private String lastName;
+	@Column(unique=true)
 	private String userName;
 	private String description;
-	private BigDecimal balance=BigDecimal.ZERO;
+	private BigDecimal balance=BigDecimal.TEN;
 	private String password;
 
 	private @Version @JsonIgnore Long version;
@@ -53,6 +50,7 @@ public class Employee {
 		this.description = description;
 		this.manager = manager;
 		this.userName=userName;
+		this.password=Manager.PASSWORD_ENCODER.encode("123");
 
 	}
 
@@ -158,7 +156,7 @@ public class Employee {
 	}
 
 	public void setPassword(String password) {
-		this.password = Manager.PASSWORD_ENCODER.encode(password);
+		this.password = this.password!=null &&this.password.equals(password)? password : Manager.PASSWORD_ENCODER.encode(password);
 	}
 }
 
