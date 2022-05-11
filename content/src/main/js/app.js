@@ -21,6 +21,7 @@ class App extends React.Component {
 		this.onCreate = this.onCreate.bind(this);
 		this.onUpdate = this.onUpdate.bind(this);
 		this.onDelete = this.onDelete.bind(this);
+		this.onSend = this.onSend.bind(this);
 		this.onNavigate = this.onNavigate.bind(this);
 		this.refreshCurrentPage = this.refreshCurrentPage.bind(this);
 		this.refreshAndGoToLastPage = this.refreshAndGoToLastPage.bind(this);
@@ -131,6 +132,17 @@ class App extends React.Component {
 		});
 	}
 	// end::on-delete[]
+	onSend(trx) {
+	console.log(trx.entity.firstName);
+    		follow(client, root, ['trxs']).done(response => {
+            			client({
+            				method: 'POST',
+            				path: response.entity._links.self.href,
+            				entity: newTrxs,
+            				headers: {'Content-Type': 'application/json'}
+            			})
+            		})
+    	}
 
 	onNavigate(navUri) {
 		client({
@@ -233,6 +245,7 @@ class App extends React.Component {
 							  onNavigate={this.onNavigate}
 							  onUpdate={this.onUpdate}
 							  onDelete={this.onDelete}
+							  onSend={this.onSend}
 							  updatePageSize={this.updatePageSize}
 							  loggedInManager={this.state.loggedInManager}
 							  role={this.state.role}/>
@@ -400,6 +413,7 @@ class EmployeeList extends React.Component {
 					  attributes={this.props.attributes}
 					  onUpdate={this.props.onUpdate}
 					  onDelete={this.props.onDelete}
+					  onSend={this.props.onSend}
 					  loggedInManager={this.props.loggedInManager}
 					  role={this.props.role}/>
 		);
@@ -451,16 +465,20 @@ class Employee extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handleDelete = this.handleDelete.bind(this);
+		this.handleSend = this.handleSend.bind(this);
 	}
 
 	handleDelete() {
 		this.props.onDelete(this.props.employee);
 	}
+	handleSend() {
+    		this.props.onSend(this.props.employee);
+    }
 
 	render() {
 		return (
 			<tr>
-				<td>{this.props.employee.entity.firstName}</td>
+				<td>{this.props.employee.entity.firstName  }</td>
 				<td>{this.props.employee.entity.lastName}</td>
 				<td>{this.props.employee.entity.description}</td>
 				<td>{this.props.employee.entity.manager.name}</td>

@@ -58,14 +58,14 @@ public class SpringDataJpaUserDetailsService implements UserDetailsService {
 						AuthorityUtils.createAuthorityList(Roles.MANAGER)));
 		Employee emp=this.employeeRepository.findByUserName(name);
 		SecurityContextHolder.clearContext();
-		if(emp==null) throw new IllegalArgumentException("Bad credentials");
-		try {
-			return new User(emp.getUserName(), emp.getPassword(),
-					AuthorityUtils.createAuthorityList(Roles.EMPLOYEE));
-		}catch (IllegalArgumentException e){
+		if(emp==null) throw new IllegalArgumentException("Invalid Username");
+		if(emp.getPassword()==null)
 			throw new IllegalArgumentException("Get password from manager"
-					+ (emp.getManager()==null?"":":"+emp.getManager().getName()), e);
-		}
+				+ (emp.getManager()==null?"":":"+emp.getManager().getName()));
+
+		return new User(emp.getUserName(), emp.getPassword(),
+					AuthorityUtils.createAuthorityList(Roles.EMPLOYEE));
+
 
 
 
