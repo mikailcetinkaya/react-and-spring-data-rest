@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 
 
 @Component
-@RepositoryEventHandler(Employee.class)
+@RepositoryEventHandler
 public class SpringDataRestEventHandler {
 
 	Logger logger = LoggerFactory.getLogger(SpringDataRestEventHandler.class);
@@ -65,6 +65,7 @@ public class SpringDataRestEventHandler {
 	public void applyUserInformationUsingSecurityContext(Trx trx) throws Exception {
 		logger.info(trx.getSenderUserName());
 		logger.info(trx.getReceiverUserName());
+		String name = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		if(trx.getReceiverUserName()==null) throw new Exception("Bad Receiver");
 		if(trx.getSenderUserName()==null) throw new Exception("Bad Sender");
@@ -75,16 +76,28 @@ public class SpringDataRestEventHandler {
 		Employee sender = this.employeeRepository.findByUserName(trx.getSenderUserName());
 
 		Manager manager = this.managerRepository.findByName(trx.getSenderUserName());
+
+		receiver.setBalance(receiver.getBalance().add(trx.getBalance()));
+
 		if(manager==null)
 		{
 			if(sender.getBalance().compareTo(trx.getBalance())<0)
 				throw new Exception("Insufficient Funds");
 			sender.setBalance(sender.getBalance().subtract(trx.getBalance()));
 			this.employeeRepository.save(sender);
+			SecurityContextHolder.getContext().setAuthentication(
+					new UsernamePasswordAuthenticationToken("SYSTEM", "doesn't matter",
+							AuthorityUtils.createAuthorityList(Roles.MANAGER)));
+
+			this.employeeRepository.save(receiver);
+			SecurityContextHolder.getContext().setAuthentication(
+					new UsernamePasswordAuthenticationToken(name, "doesn't matter",
+							AuthorityUtils.createAuthorityList(Roles.EMPLOYEE)));
+		}
+		else{
+			this.employeeRepository.save(receiver);
 		}
 
-		receiver.setBalance(receiver.getBalance().add(trx.getBalance()));
-		this.employeeRepository.save(receiver);
 
 	}
 }
