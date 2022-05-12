@@ -1,0 +1,35 @@
+= React + Spring Boot
+
+Welcome, Recruiters.
+
+This Project uses Spring Boot Rest backend with React website in order to manage a wallet app. Project manages node and npm so no prior install required.
+
+It has websockets. Open two browsers and see changes reflecting to each other.
+
+It has security policy buit-in.
+Manager-Employee roles are defined. Managers can update only employees they created. Employees can create employees that are owned by them and only they can update them. Managers have unlimited money to give whereas employees donot.
+
+It has secured HATEOAS rest interface. Goto localhost:8080/api for HAL links. Use that links to browse data if you are authorized :)
+ Also you may fall into access denied position because of ownerships.
+
+It has docker support. Spring fat jar is put into good use...
+
+Passwords are being encoded and owners can change them.
+
+== Step 0 -- Setting up Your Environment
+Just run dockerBuildRun.bat for Windows.
+
+Just run dockerBuildRun.sh for others.
+
+And goto localhost:8080
+
+== Step 1 -- Login as Users
+Managers [{user:miko , pass:yuji},{user:yuji , pass:miko}]
+Employees use usernames frodo - bilbo - gangan -... with password 123
+
+== Step 2 -- Send
+
+Employees have default 10 bucks. Send some ...
+
+== Step 3 -- Create New Employees
+Create sub employees.
