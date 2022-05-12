@@ -10,7 +10,7 @@ It has security policy buit-in.
 Manager-Employee roles are defined. Managers can update only employees they created. Employees can create employees that are owned by them and only they can update them. Managers have unlimited money to give whereas employees donot.
 
 It has secured HATEOAS rest interface. Goto localhost:8080/api for HAL links. Use that links to browse data if you are authorized :)
- Also you may fall into access denied position because of ownerships.
+ Also you may fall into access denied position because of ownerships. Paging is also supported.
 
 It has docker support. Spring fat jar is put into good use...
 
